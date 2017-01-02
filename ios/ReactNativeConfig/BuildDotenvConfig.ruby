@@ -5,26 +5,19 @@ require "json"
 # pick a custom env file if set
 if File.exists?("/tmp/envfile")
   custom_env = true
-  file = File.read("/tmp/envfile").strip
+  env = File.read("/tmp/envfile").strip
 else
   custom_env = false
-  file = ".env"
+  env = "development"
 end
 
-puts "Reading env from #{file}"
+puts "Reading env from #{env}"
 
 dotenv = begin
   # find that above node_modules/react-native-config/ios/
-  raw = File.read(File.join(Dir.pwd, "../../../#{file}"))
-  raw.split("\n").inject({}) do |h, line|
-    key, val = line.split("=", 2)
-    if line.strip.empty? or line.start_with?('#')
-      h
-    else
-      key, val = line.split("=", 2)
-      h.merge!(key => val)
-    end
-  end
+  # raw = File.read(File.join(Dir.pwd, "../../../env.json"))
+  file = File.read(File.join(Dir.pwd, "../../../env.json"))
+  JSON.parse(file)[env] || {}
 rescue Errno::ENOENT
   puts("**************************")
   puts("*** Missing .env file ****")
